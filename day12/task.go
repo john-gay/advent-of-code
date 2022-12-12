@@ -57,17 +57,17 @@ func (t *task) breadthFirstSearch() (int, int) {
 			{current.x + 1, current.y},
 			{current.x - 1, current.y}} {
 
-			alreadyChecked := false
-			if distance[next] != 0 {
-				alreadyChecked = true
+			// if already checked
+			if distance[next] > 0 {
+				continue
 			}
 
-			coordExists := false
-			if t.grid[next] != 0 {
-				coordExists = true
+			// next exits in grid
+			if t.grid[next] == 0 {
+				continue
 			}
 
-			if !alreadyChecked && coordExists && t.grid[current] <= t.grid[next]+1 {
+			if t.grid[current] <= t.grid[next]+1 {
 				distance[next] = distance[current] + 1
 				queue = append(queue, next)
 			}
