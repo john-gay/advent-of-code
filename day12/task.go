@@ -44,7 +44,7 @@ func run() (int, int) {
 }
 
 func (t *task) breadthFirstSearch() (int, int) {
-	distance := map[coord]int{t.end: 0}
+	distance := map[coord]int{t.start: 0}
 	queue := []coord{t.end}
 
 	for len(queue) > 0 {
