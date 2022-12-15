@@ -32,7 +32,7 @@ func main() {
 
 	part1, part2 := run()
 
-	log.Println(fmt.Sprintf("Part 1: %d, test = 26, not 4137843", part1))
+	log.Println(fmt.Sprintf("Part 1: %d", part1))
 	log.Println(fmt.Sprintf("Part 2: %d", part2))
 
 	elapsed := time.Since(start)
@@ -42,14 +42,41 @@ func main() {
 func run() (int, int) {
 	t := readInput()
 
-	//fmt.Println(fmt.Sprintf("%+v", t))
-
-	//part1 := t.freeSpaces(10)
 	part1 := t.freeSpaces(2000000)
 
-	part2 := 0
+	part2 := t.tuningFrequency()
 
 	return part1, part2
+}
+
+func (t *Task) tuningFrequency() int {
+	current := Point{0, 0}
+	checkedSensor := Sensor{}
+
+	for {
+		match := false
+		for _, sensor := range t.sensors {
+			if manhatDist(current, sensor.location) <= sensor.distance {
+				checkedSensor = sensor
+				match = true
+				break
+			}
+		}
+		if !match {
+			break
+		}
+        
+        jump := checkedSensor.distance - manhatDist(checkedSensor.location, current) + 1
+        
+        if current.x + jump > 4000000 {
+            current.x = 0
+            current.y++
+        } else {
+            current.x += jump
+        }
+	}
+
+	return current.x * 4000000 + current.y
 }
 
 func (t *Task) freeSpaces(y int) int {
@@ -68,9 +95,7 @@ outerLoop:
 	for x := minX; x <= maxX; x++ {
 		point := Point{x, y}
 		for _, sensor := range t.sensors {
-			//fmt.Println(point, sensor.location, manhatDist(point, sensor.location), sensor.distance)
 			if point != sensor.nearest && manhatDist(point, sensor.location) <= sensor.distance {
-				//fmt.Println("not empty")
 				total++
 				continue outerLoop
 			}
