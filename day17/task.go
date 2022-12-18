@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"strings"
 	"time"
@@ -15,7 +16,6 @@ type Task struct {
 	grid []Point
 	jets []string
 	shapes [][]Point
-	width int
 }
 
 type Point struct {
@@ -38,14 +38,14 @@ func main() {
 func run() (int, int) {
 	t := readInput()
 
-	// fmt.Println(t)
+	fmt.Println(t)
 
 	part1 := t.play(2022)
 
-	// t = readInput()
-	// part2 := t.play(1000000000000)
+	t = readInput()
+	part2 := t.play(1000000000000)
 
-	return part1, 0
+	return part1, part2
 }
 
 func (t *Task) play(rocks int) int {
@@ -53,28 +53,23 @@ func (t *Task) play(rocks int) int {
 	shapeIndex := 0
 	jetIndex := 0
 
-	// t.printGrid()
+	rockSkip := []int{0,0}
+	// heightSkip := []int{178,337} // Sample skip values
+	heightSkip := []int{6575, 9222} // Found by checking printed grid for repeats
+	skipped := false
 
 	for rock := 0; rock < rocks; rock++ {
-
-		// fmt.Println(rock+1)
-		// t.printGrid()
-
 		var shape []Point
 		shapeIndex, shape = t.getShape(shapeIndex)
 		current := shapeLocation(2, maxHeight + 3, shape)
-		
-		// fmt.Println(fmt.Sprintf("start: %+v", current))
-
+	
 		falling := true
 		for falling {
 			var jet string
 			jetIndex, jet = t.getJet(jetIndex)
-			// fmt.Println(jet)
 			if t.canPush(current, jet) {
 				current = t.jetPush(current, jet)
 			}
-			// fmt.Println(fmt.Printf("after jet: %+v", current))
 			if t.canFall(current) {
 				current = fall(current)
 			} else {
@@ -82,17 +77,46 @@ func (t *Task) play(rocks int) int {
 			}
 		}
 
-		// fmt.Println(fmt.Sprintf("after falling: %+v", current))
-
 		t.setShape(current)
 		height := shapeHeight(current)
+
 		if maxHeight < height {
 			maxHeight = height
 		}
+		
+		if height > heightSkip[0] && rockSkip[0] == 0{
+			fmt.Println(fmt.Sprintf("missed %d", heightSkip[0]))
+			break
+		}
+		if height == heightSkip[0] {
+			rockSkip[0] = rock
+		}
 
-		// fmt.Println(fmt.Sprintf("rock: %d, height %d", rock, height))
+		if height > heightSkip[1] && rockSkip[1] == 0{
+			fmt.Println(fmt.Sprintf("missed %d", heightSkip[1]))
+			break
+		}
+		if height == heightSkip[1] {
+			rockSkip[1] = rock
+		}
+
+		if rockSkip[1] != 0  && !skipped {
+			fmt.Println(fmt.Sprintf("current rock: %d, current height: %d", rock, maxHeight))
+
+			fmt.Println("skiping")
+			skipped = true
+			dR := rockSkip[1] - rockSkip[0]
+			skips := int(math.Floor(float64(rocks - rock) / float64(dR)))
+			rock = rock + dR * skips
+			maxHeight = height + (heightSkip[1] - heightSkip[0]) * skips
+			fmt.Println(fmt.Sprintf("dr: %d, skips: %d, new rock: %d, new height: %d", dR, skips, rock, maxHeight))
+
+			for x := 0; x <= 7; x++ {
+				t.grid = append(t.grid, Point{x, maxHeight})
+			}
+		}
 	}
-	// t.printGrid()
+	// t.printGrid(maxHeight+1)
 
 	return maxHeight
 }
@@ -122,26 +146,18 @@ func fall(current []Point) []Point {
 }
 
 func (t *Task) canFall(current []Point) bool {
-	// fmt.Println("In can fall")
-	// fmt.Println(t.grid)
-	// fmt.Println(current)
 	for _, point := range current {
 		if point.y -1 < 0 {
-			// fmt.Println("Can't fall, y=0")
-
 			return false
 		}
 		for _, set := range t.grid {
 			below := point
 			below.y -= 1
 			if below == set {
-				// fmt.Println("Can't fall, grid set")
-
 				return false
 			}
 		}
 	}
-	// fmt.Println("Can fall")
 	return true
 }
 
@@ -226,7 +242,6 @@ func readInput() Task {
 		grid: []Point{},
 		jets: []string{},
 		shapes: [][]Point{},
-		width: 7,
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -250,14 +265,13 @@ func readInput() Task {
 	return t
 }
 
-func (t *Task) printGrid() {
-	screen := make([][]string, 25)
+func (t *Task) printGrid(size int) {
+	screen := make([][]string, size)
 	for i := range screen {
 		screen[i] = make([]string, 7)
 	}
 	for i := range screen {
 		for j := range screen[i] {
-			// screen[i][j] = fmt.Sprintf("%d, %d", i, j)
 			screen[i][j] = "."
 		}
 	}
