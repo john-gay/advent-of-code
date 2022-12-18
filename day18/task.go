@@ -47,19 +47,12 @@ func calcOuterSurfaceArea(points map[Point]bool) int {
 		p := queue[0]
 		queue = queue[1:]
 
-		for _, next := range []Point{
-			{p.x + 1, p.y, p.z},
-			{p.x - 1, p.y, p.z},
-			{p.x, p.y - 1, p.z},
-			{p.x, p.y + 1, p.z},
-			{p.x, p.y, p.z + 1},
-			{p.x, p.y, p.z - 1}} {
-
+		for next := range getNeighbours(p) {
 			if checked[next] {
 				continue
 			}
 
-			if next.x < -10 || next.x > 30 || next.y < -10 || next.y > 30 || next.z < -10 || next.z > 30 {
+			if next.x < -1 || next.x > 20 || next.y < -1 || next.y > 20 || next.z < -1 || next.z > 20 {
 				continue
 			}
 
@@ -78,9 +71,8 @@ func calcOuterSurfaceArea(points map[Point]bool) int {
 func calcSurfaceArea(points map[Point]bool) int {
 	area := 0
 	for point := range points {
-		neighbours := getNeighbours(point)
 		nCount := 6
-		for n := range neighbours {
+		for n := range getNeighbours(point) {
 			for otherPoint := range points {
 				if otherPoint == n {
 					nCount--
