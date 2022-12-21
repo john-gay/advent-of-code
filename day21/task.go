@@ -24,14 +24,13 @@ func main() {
 
 	log.Println(fmt.Sprintf("Part 1: %d", part1))
 
-	// Print equation and solve using online equation solver
-	log.Println(fmt.Sprintf("Part 2: %s", part2))
+	log.Println(fmt.Sprintf("Part 2: %d", part2))
 
 	elapsed := time.Since(start)
 	log.Printf("Binomial took %s", elapsed)
 }
 
-func run() (int, string) {
+func run() (int, int) {
 	task := readInput()
 
 	part1 := task.monkeyValue("root")
@@ -39,30 +38,9 @@ func run() (int, string) {
 	task.monkeys["root"] = []string{task.monkeys["root"].([]string)[0], "=", task.monkeys["root"].([]string)[2]}
 	task.monkeys["humn"] = "x"
 
-	return part1, task.printCalc("", "root")
-}
+	part2 := task.gradientDescent()
 
-func (t *Task) printCalc(path, name string) string {
-	if reflect.TypeOf(t.monkeys[name]).String() == "int" {
-		return path + strconv.Itoa(t.monkeys[name].(int))
-	} else if reflect.TypeOf(t.monkeys[name]).String() == "string" {
-		return path + t.monkeys[name].(string)
-	} else {
-		monkeyCalc := t.monkeys[name].([]string)
-		switch monkeyCalc[1] {
-		case "+":
-			return path + "(" + t.printCalc(path, monkeyCalc[0]) + "+" + t.printCalc(path, monkeyCalc[2]) + ")"
-		case "-":
-			return path + "(" + t.printCalc(path, monkeyCalc[0]) + "-" + t.printCalc(path, monkeyCalc[2]) + ")"
-		case "*":
-			return path + "(" + t.printCalc(path, monkeyCalc[0]) + "*" + t.printCalc(path, monkeyCalc[2]) + ")"
-		case "/":
-			return path + "(" + t.printCalc(path, monkeyCalc[0]) + "/" + t.printCalc(path, monkeyCalc[2]) + ")"
-		case "=":
-			return path + "(" + t.printCalc(path, monkeyCalc[0]) + "=" + t.printCalc(path, monkeyCalc[2]) + ")"
-		}
-	}
-	panic(fmt.Sprintf("unhandled: %s", name))
+	return part1, part2
 }
 
 func (t *Task) monkeyValue(name string) int {
@@ -82,6 +60,17 @@ func (t *Task) monkeyValue(name string) int {
 		}
 	}
 	panic(fmt.Sprintf("unhandled: %s", name))
+}
+
+func (t *Task) gradientDescent() int {
+	result := 1
+	t.monkeys["humn"] = 1
+	for result != 0 {
+		monkeyCalc := t.monkeys["root"].([]string)
+		result = t.monkeyValue(monkeyCalc[2]) - t.monkeyValue(monkeyCalc[0])
+		t.monkeys["humn"] = t.monkeys["humn"].(int) + int(-0.1*float64(result))
+	}
+	return t.monkeys["humn"].(int)
 }
 
 func readInput() Task {
