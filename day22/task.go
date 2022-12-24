@@ -30,9 +30,9 @@ func main() {
 
 	part1, part2 := run()
 
-	log.Println(fmt.Sprintf("Part 1: %d == 144244", part1))
+	log.Println(fmt.Sprintf("Part 1: %d", part1))
 
-	log.Println(fmt.Sprintf("Part 2: %d 107388 < x < 151106, not 113298, 116142, 117169", part2))
+	log.Println(fmt.Sprintf("Part 2: %d", part2))
 
 	elapsed := time.Since(start)
 	log.Printf("Binomial took %s", elapsed)
@@ -40,16 +40,13 @@ func main() {
 
 func run() (int, int) {
 	task := readInput()
+	part1 := task.mapPath()
 
-	//fmt.Println(task)
+	task2 := readInput()
+	task2.cube = true
+	part2 := task2.mapPath()
 
-	//part1 := task.mapPath()
-
-	task.cube = true
-	part2 := task.mapPath()
-
-	return 0, part2
-	//return part1, part2
+	return part1, part2
 }
 
 func (t *Task) mapPath() int {
@@ -57,7 +54,6 @@ func (t *Task) mapPath() int {
 	t.facing = "right"
 	t.face = "A"
 	for _, direction := range t.directions {
-		//fmt.Println(position)
 		switch direction {
 		case "R":
 			t.rotateClockwise()
@@ -67,7 +63,6 @@ func (t *Task) mapPath() int {
 			position = t.move(position, direction)
 		}
 	}
-	//fmt.Println(position, facing)
 	return t.password(position)
 }
 
@@ -90,22 +85,36 @@ func (t *Task) move(position Point, direction string) Point {
 	moves, _ := strconv.Atoi(direction)
 
 	for i := 0; i < moves; i++ {
+		var blocked bool
+		var nextPosition Point
 		switch t.facing {
 		case "right":
-			position = t.moveStep(position, Point{1, 0})
+			nextPosition, blocked = t.moveStep(position, Point{1, 0})
+			if !blocked {
+				position = nextPosition
+			}
 		case "up":
-			position = t.moveStep(position, Point{0, -1})
+			nextPosition, blocked = t.moveStep(position, Point{0, -1})
+			if !blocked {
+				position = nextPosition
+			}
 		case "left":
-			position = t.moveStep(position, Point{-1, 0})
+			nextPosition, blocked = t.moveStep(position, Point{-1, 0})
+			if !blocked {
+				position = nextPosition
+			}
 		case "down":
-			position = t.moveStep(position, Point{0, 1})
+			nextPosition, blocked = t.moveStep(position, Point{0, 1})
+			if !blocked {
+				position = nextPosition
+			}
 		}
 	}
 
 	return position
 }
 
-func (t *Task) moveStep(position Point, next Point) Point {
+func (t *Task) moveStep(position Point, next Point) (Point, bool) {
 	if t.cube == true {
 		return t.moveStepCube(position, next)
 	} else {
@@ -113,221 +122,161 @@ func (t *Task) moveStep(position Point, next Point) Point {
 	}
 }
 
-func (t *Task) moveStepCube(position Point, next Point) Point {
-	//fmt.Println(fmt.Sprintf("%+v", position), t.face)
-	nextPosition, blocked := t.getNextCubePosition(position, next)
-	if blocked {
-		return position
-	}
-	//fmt.Println(fmt.Sprintf("%+v", nextPosition), t.face)
-	if t.grid[nextPosition] == "" {
-		panic(fmt.Sprintf("%+v", nextPosition) + " " + t.face)
-	}
-	return nextPosition
-}
+func (t *Task) moveStepCube(position Point, next Point) (Point, bool) {
+	nextPosition := Point{position.x + next.x, position.y + next.y}
 
-func (t *Task) getNextCubePosition(position Point, next Point) (Point, bool) {
-	position = Point{position.x + next.x, position.y + next.y}
+	if t.grid[nextPosition] == "#" {
+		return position, true
+	}
 
-	nextPosition := position
 	switch t.face {
 	case "A":
-		// 50 < x < 100
-		// 0 < y < 50
-		if position.x < 50 {
-			nextPosition = Point{0, 149 - position.y%50}
+		if nextPosition.x < 50 {
+			nextPosition = Point{0, 149 - nextPosition.y%50}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
-			t.checkIsAnEdge(nextPosition)
 			t.face = "E"
 			t.facing = "right"
-		}
-		if position.x > 99 {
+		} else if nextPosition.x > 99 {
 			t.face = "B"
-		}
-		if position.y < 0 {
-			nextPosition = Point{0, 150 + position.x%50}
+		} else if nextPosition.y < 0 {
+			nextPosition = Point{0, 150 + nextPosition.x%50}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "F"
 			t.facing = "right"
-			t.checkIsAnEdge(nextPosition)
-
-		}
-		if position.y > 49 {
+		} else if nextPosition.y > 49 {
 			t.face = "C"
 		}
 	case "B":
-		// 100 < x < 150
-		// 0 < y < 50
-		if position.x < 100 {
+		if nextPosition.x < 100 {
 			t.face = "A"
-		}
-		if position.x > 149 {
-			nextPosition = Point{99, 149 - position.y%50}
+		} else if nextPosition.x > 149 {
+			nextPosition = Point{99, 149 - nextPosition.y%50}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "D"
 			t.facing = "left"
-			t.checkIsAnEdge(nextPosition)
-		}
-		if position.y < 0 {
-			nextPosition = Point{position.x % 50, 199}
+		} else if nextPosition.y < 0 {
+			nextPosition = Point{nextPosition.x % 50, 199}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "F"
 			t.facing = "up"
-			t.checkIsAnEdge(nextPosition)
-		}
-		if position.y > 49 {
-			nextPosition = Point{99, 50 + position.x%50}
+		} else if nextPosition.y > 49 {
+			nextPosition = Point{99, 50 + nextPosition.x%50}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "C"
 			t.facing = "left"
-			t.checkIsAnEdge(nextPosition)
 		}
 	case "C":
-		// 50 < x < 100
-		// 50 < y < 100
-		if position.x < 50 {
-			nextPosition = Point{position.y % 50, 100}
+		if nextPosition.x < 50 {
+			nextPosition = Point{nextPosition.y % 50, 100}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "E"
 			t.facing = "down"
-			t.checkIsAnEdge(nextPosition)
-		}
-		if position.x > 99 {
-			nextPosition = Point{100 + position.y%50, 49}
+		} else if nextPosition.x > 99 {
+			nextPosition = Point{100 + nextPosition.y%50, 49}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "B"
 			t.facing = "up"
-			t.checkIsAnEdge(nextPosition)
-		}
-		if position.y < 50 {
+		} else if nextPosition.y < 50 {
 			t.face = "A"
-		}
-		if position.y > 99 {
+		} else if nextPosition.y > 99 {
 			t.face = "D"
 		}
 	case "D":
-		// 50 < x < 100
-		// 100 < y < 150
-		if position.x < 50 {
+		if nextPosition.x < 50 {
 			t.face = "E"
-		}
-		if position.x > 99 {
-			nextPosition = Point{149, 49 - position.y%50}
+		} else if nextPosition.x > 99 {
+			nextPosition = Point{149, 49 - nextPosition.y%50}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "B"
 			t.facing = "left"
-			t.checkIsAnEdge(nextPosition)
-		}
-		if position.y < 100 {
+		} else if nextPosition.y < 100 {
 			t.face = "C"
-		}
-		if position.y > 149 {
-			nextPosition = Point{49, 150 + position.x%50}
+		} else if nextPosition.y > 149 {
+			nextPosition = Point{49, 150 + nextPosition.x%50}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "F"
 			t.facing = "left"
-			t.checkIsAnEdge(nextPosition)
 		}
 	case "E":
-		// 0 < x < 50
-		// 100 < y < 150
-		if position.x < 0 {
-			nextPosition = Point{50, 49 - position.y%50}
+		if nextPosition.x < 0 {
+			nextPosition = Point{50, 49 - nextPosition.y%50}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "A"
 			t.facing = "right"
-			t.checkIsAnEdge(nextPosition)
-		}
-		if position.x > 49 {
+		} else if nextPosition.x > 49 {
 			t.face = "D"
-		}
-		if position.y < 100 {
-			nextPosition = Point{50, 50 + position.x%50}
+		} else if nextPosition.y < 100 {
+			nextPosition = Point{50, 50 + nextPosition.x%50}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "C"
 			t.facing = "right"
-			t.checkIsAnEdge(nextPosition)
-		}
-		if position.y > 149 {
+		} else if nextPosition.y > 149 {
 			t.face = "F"
 		}
 	case "F":
-		// 0 < x < 50
-		// 150 < y < 200
-		if position.x < 0 {
-			nextPosition = Point{50 + position.y%50, 0}
+		if nextPosition.x < 0 {
+			nextPosition = Point{50 + nextPosition.y%50, 0}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "A"
 			t.facing = "down"
-			t.checkIsAnEdge(nextPosition)
-		}
-		if position.x > 49 {
-			nextPosition = Point{50 + position.y%50, 149}
+		} else if nextPosition.x > 49 {
+			nextPosition = Point{50 + nextPosition.y%50, 149}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "D"
 			t.facing = "up"
-			t.checkIsAnEdge(nextPosition)
-		}
-		if position.y < 150 {
+		} else if nextPosition.y < 150 {
 			t.face = "E"
-		}
-		if position.y > 199 {
-			nextPosition = Point{100 + position.x%50, 0}
+		} else if nextPosition.y > 199 {
+			nextPosition = Point{100 + nextPosition.x%50, 0}
 			if t.grid[nextPosition] == "#" {
 				return position, true
 			}
 			t.face = "B"
 			t.facing = "down"
-			t.checkIsAnEdge(nextPosition)
 		}
 	}
 
 	return nextPosition, false
 }
 
-func (t *Task) moveStepPlane(position Point, next Point) Point {
-	var blocked bool
+func (t *Task) moveStepPlane(position Point, next Point) (Point, bool) {
 	var nextPosition Point
 	nextPosition = Point{position.x + next.x, position.y + next.y}
 	switch t.grid[nextPosition] {
 	case "":
-		nextPosition, blocked = t.getNextPosition(nextPosition, next)
-		if blocked {
-			return position
-		}
-		position = nextPosition
+		return t.getNextPosition(nextPosition, next)
 	case "#":
-		return position
+		return position, true
 	case ".":
-		position = nextPosition
+		return nextPosition, false
 	}
-	return position
+	panic("invalid position")
 }
 
 func (t *Task) getNextPosition(position, next Point) (Point, bool) {
@@ -382,13 +331,6 @@ func (t *Task) rotateClockwise() {
 		t.facing = "up"
 	case "up":
 		t.facing = "right"
-	}
-}
-
-func (t *Task) checkIsAnEdge(p Point) {
-	if t.grid[Point{p.x + 1, p.y}] != "" && t.grid[Point{p.x - 1, p.y}] != "" &&
-		t.grid[Point{p.x, p.y + 1}] != "" && t.grid[Point{p.x, p.y - 1}] != "" {
-		panic(fmt.Sprintf("not an edge: %+v, %s", p, t.face))
 	}
 }
 
