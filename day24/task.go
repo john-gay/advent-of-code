@@ -165,12 +165,8 @@ func readInput() Task {
 	}
 	defer file.Close()
 
-	maxT := 800
-	blizzards := make([]Blizzard, maxT)
-
 	task := Task{
-		blizzard: blizzards,
-		start:    Point{-1, -1},
+		start: Point{-1, -1},
 	}
 
 	blizzard := Blizzard{
@@ -197,7 +193,11 @@ func readInput() Task {
 		}
 	}
 
-	task.blizzard[0] = blizzard
+	maxT := task.maxX * task.maxY
+	blizzards := make([]Blizzard, maxT)
+	blizzards[0] = blizzard
+
+	task.blizzard = blizzards
 
 	for i := 1; i < maxT; i++ {
 		task.createBlizzard(i)
