@@ -13,8 +13,8 @@ import (
 var input = "day17/input.txt"
 
 type Task struct {
-	grid []Point
-	jets []string
+	grid   []Point
+	jets   []string
 	shapes [][]Point
 }
 
@@ -53,7 +53,7 @@ func (t *Task) play(rocks int) int {
 	shapeIndex := 0
 	jetIndex := 0
 
-	rockSkip := []int{0,0}
+	rockSkip := []int{0, 0}
 	// heightSkip := []int{178,337} // Sample skip values
 	heightSkip := []int{6575, 9222} // Found by checking printed grid for repeats
 	skipped := false
@@ -61,8 +61,8 @@ func (t *Task) play(rocks int) int {
 	for rock := 0; rock < rocks; rock++ {
 		var shape []Point
 		shapeIndex, shape = t.getShape(shapeIndex)
-		current := shapeLocation(2, maxHeight + 3, shape)
-	
+		current := shapeLocation(2, maxHeight+3, shape)
+
 		falling := true
 		for falling {
 			var jet string
@@ -83,8 +83,8 @@ func (t *Task) play(rocks int) int {
 		if maxHeight < height {
 			maxHeight = height
 		}
-		
-		if height > heightSkip[0] && rockSkip[0] == 0{
+
+		if height > heightSkip[0] && rockSkip[0] == 0 {
 			fmt.Println(fmt.Sprintf("missed %d", heightSkip[0]))
 			break
 		}
@@ -92,7 +92,7 @@ func (t *Task) play(rocks int) int {
 			rockSkip[0] = rock
 		}
 
-		if height > heightSkip[1] && rockSkip[1] == 0{
+		if height > heightSkip[1] && rockSkip[1] == 0 {
 			fmt.Println(fmt.Sprintf("missed %d", heightSkip[1]))
 			break
 		}
@@ -100,15 +100,15 @@ func (t *Task) play(rocks int) int {
 			rockSkip[1] = rock
 		}
 
-		if rockSkip[1] != 0  && !skipped {
+		if rockSkip[1] != 0 && !skipped {
 			fmt.Println(fmt.Sprintf("current rock: %d, current height: %d", rock, maxHeight))
 
 			fmt.Println("skiping")
 			skipped = true
 			dR := rockSkip[1] - rockSkip[0]
-			skips := int(math.Floor(float64(rocks - rock) / float64(dR)))
-			rock = rock + dR * skips
-			maxHeight = height + (heightSkip[1] - heightSkip[0]) * skips
+			skips := int(math.Floor(float64(rocks-rock) / float64(dR)))
+			rock = rock + dR*skips
+			maxHeight = height + (heightSkip[1]-heightSkip[0])*skips
 			fmt.Println(fmt.Sprintf("dr: %d, skips: %d, new rock: %d, new height: %d", dR, skips, rock, maxHeight))
 
 			for x := 0; x <= 7; x++ {
@@ -147,7 +147,7 @@ func fall(current []Point) []Point {
 
 func (t *Task) canFall(current []Point) bool {
 	for _, point := range current {
-		if point.y -1 < 0 {
+		if point.y-1 < 0 {
 			return false
 		}
 		for _, set := range t.grid {
@@ -202,7 +202,7 @@ func (t *Task) jetPush(current []Point, jet string) []Point {
 func (t *Task) canPush(current []Point, jet string) bool {
 	if jet == ">" {
 		for _, point := range current {
-			if point.x + 1 >= 7 {
+			if point.x+1 >= 7 {
 				return false
 			}
 			for _, set := range t.grid {
@@ -216,7 +216,7 @@ func (t *Task) canPush(current []Point, jet string) bool {
 		return true
 	} else {
 		for _, point := range current {
-			if point.x - 1 < 0 {
+			if point.x-1 < 0 {
 				return false
 			}
 			for _, set := range t.grid {
@@ -239,8 +239,8 @@ func readInput() Task {
 	defer file.Close()
 
 	t := Task{
-		grid: []Point{},
-		jets: []string{},
+		grid:   []Point{},
+		jets:   []string{},
 		shapes: [][]Point{},
 	}
 
@@ -258,7 +258,7 @@ func readInput() Task {
 	t.shapes = append(t.shapes,
 		[]Point{{0, 0}, {1, 0}, {2, 0}, {3, 0}},
 		[]Point{{1, 0}, {0, 1}, {1, 1}, {2, 1}, {1, 2}},
-		[]Point{{2, 2}, {2, 1}, {2, 0}, {1, 0},{0, 0}},
+		[]Point{{2, 2}, {2, 1}, {2, 0}, {1, 0}, {0, 0}},
 		[]Point{{0, 0}, {0, 1}, {0, 2}, {0, 3}},
 		[]Point{{0, 0}, {1, 0}, {0, 1}, {1, 1}})
 
@@ -278,7 +278,7 @@ func (t *Task) printGrid(size int) {
 	for _, point := range t.grid {
 		screen[point.y][point.x] = "#"
 	}
-	for i := len(screen)-1; i >= 0; i-- {
+	for i := len(screen) - 1; i >= 0; i-- {
 		fmt.Println(screen[i])
 	}
 }

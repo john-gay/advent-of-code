@@ -14,10 +14,10 @@ var input = "day10/input.txt"
 
 type task struct {
 	cycles map[int]int
-	cycle int
-	x int
+	cycle  int
+	x      int
 	screen [][]string
-	row []string
+	row    []string
 }
 
 func main() {
@@ -40,10 +40,10 @@ func run() int {
 
 	t := task{
 		cycles: map[int]int{},
-		cycle: 0,
-		x: 1,
+		cycle:  0,
+		x:      1,
 		screen: [][]string{},
-		row: []string{},
+		row:    []string{},
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -62,7 +62,7 @@ func run() int {
 	}
 
 	t.printScreen()
-	
+
 	return t.sumStrength()
 }
 
@@ -73,8 +73,8 @@ func (t *task) newCycle() {
 }
 
 func (t *task) drawPosition() {
-	position := t.cycle%40 -1
-	if t.x == position || t.x == position - 1 || t.x == position + 1 {
+	position := t.cycle%40 - 1
+	if t.x == position || t.x == position-1 || t.x == position+1 {
 		t.row = append(t.row, "#")
 	} else {
 		t.row = append(t.row, ".")

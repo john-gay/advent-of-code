@@ -65,18 +65,18 @@ func (t *Task) tuningFrequency() int {
 		if !match {
 			break
 		}
-        
-        jump := checkedSensor.distance - manhatDist(checkedSensor.location, current) + 1
-        
-        if current.x + jump > 4000000 {
-            current.x = 0
-            current.y++
-        } else {
-            current.x += jump
-        }
+
+		jump := checkedSensor.distance - manhatDist(checkedSensor.location, current) + 1
+
+		if current.x+jump > 4000000 {
+			current.x = 0
+			current.y++
+		} else {
+			current.x += jump
+		}
 	}
 
-	return current.x * 4000000 + current.y
+	return current.x*4000000 + current.y
 }
 
 func (t *Task) freeSpaces(y int) int {

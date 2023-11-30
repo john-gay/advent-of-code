@@ -13,7 +13,7 @@ import (
 var input = "day9/input.txt"
 
 type rope struct {
-	knots []coord
+	knots   []coord
 	visited map[string]bool
 }
 
@@ -56,7 +56,7 @@ func tailVisited(numberOfKnots int) int {
 	}
 
 	for i := 0; i < numberOfKnots; i++ {
-		r.knots = append(r.knots, coord{0,0})
+		r.knots = append(r.knots, coord{0, 0})
 	}
 
 	for scanner.Scan() {
@@ -76,7 +76,7 @@ func tailVisited(numberOfKnots int) int {
 			}
 		}
 	}
-	
+
 	return len(r.visited)
 }
 
@@ -116,7 +116,7 @@ func (r *rope) updateKnots() {
 }
 
 func (r *rope) updateKnot(index int) {
-	head := &r.knots[index - 1]
+	head := &r.knots[index-1]
 	tail := &r.knots[index]
 
 	dX := tail.x - head.x
@@ -129,7 +129,7 @@ func (r *rope) updateKnot(index int) {
 }
 
 func (r *rope) visit(x, y int) {
-	r.visited[fmt.Sprintf("%d+%d", x,y)] = true
+	r.visited[fmt.Sprintf("%d+%d", x, y)] = true
 }
 
 func magnitude(value int) int {

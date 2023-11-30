@@ -13,11 +13,11 @@ import (
 var input = "day8/input.txt"
 
 type Dir struct {
-	name string
-	parent *Dir
+	name        string
+	parent      *Dir
 	directories []*Dir
-	files []File
-	totalSize int
+	files       []File
+	totalSize   int
 }
 
 type File struct {
@@ -56,7 +56,6 @@ func readInput() [][]int {
 
 	scanner := bufio.NewScanner(file)
 
-
 	grid := [][]int{}
 
 	for scanner.Scan() {
@@ -79,7 +78,7 @@ func countVisible(grid [][]int) int {
 
 	for i, row := range grid {
 		for j, _ := range row {
-			if isVisible(i,j, grid) {
+			if isVisible(i, j, grid) {
 				count++
 			}
 		}
@@ -88,8 +87,8 @@ func countVisible(grid [][]int) int {
 	return count
 }
 
-func isVisible(x,y int, grid [][]int) bool {
-	if x == 0 || y == 0 || x == len(grid) -1 || y == len(grid[0]) -1 {
+func isVisible(x, y int, grid [][]int) bool {
+	if x == 0 || y == 0 || x == len(grid)-1 || y == len(grid[0])-1 {
 		return true
 	}
 
@@ -105,7 +104,7 @@ func isVisible(x,y int, grid [][]int) bool {
 		}
 	}
 
-	for i := len(grid[0]) -1; x < i; i-- {
+	for i := len(grid[0]) - 1; x < i; i-- {
 		if cell > grid[i][y] {
 			if x == i-1 {
 				return true
@@ -125,7 +124,7 @@ func isVisible(x,y int, grid [][]int) bool {
 		}
 	}
 
-	for j := len(grid[0]) -1; y < j; j-- {
+	for j := len(grid[0]) - 1; y < j; j-- {
 		if cell > grid[x][j] {
 			if y == j-1 {
 				return true
@@ -143,7 +142,7 @@ func bestScenicScore(grid [][]int) int {
 
 	for i, row := range grid {
 		for j, _ := range row {
-			newScore := calcScenicScore(i,j, grid)
+			newScore := calcScenicScore(i, j, grid)
 			if newScore > scenicScore {
 				scenicScore = newScore
 			}
@@ -153,32 +152,32 @@ func bestScenicScore(grid [][]int) int {
 	return scenicScore
 }
 
-func calcScenicScore(x,y int, grid [][]int) int {
-	ls, rs, us, ds := 0, 0, 0, 0;
+func calcScenicScore(x, y int, grid [][]int) int {
+	ls, rs, us, ds := 0, 0, 0, 0
 	cell := grid[x][y]
 
-	for i := x-1; i >= 0; i-- {
+	for i := x - 1; i >= 0; i-- {
 		us++
 		if cell <= grid[i][y] {
 			break
 		}
 	}
 
-	for i := x+1; i < len(grid[0]); i++ {
+	for i := x + 1; i < len(grid[0]); i++ {
 		ds++
 		if cell <= grid[i][y] {
 			break
 		}
 	}
 
-	for j := y-1; j >= 0; j-- {
+	for j := y - 1; j >= 0; j-- {
 		ls++
 		if cell <= grid[x][j] {
 			break
 		}
 	}
 
-	for j := y+1; j < len(grid); j++ {
+	for j := y + 1; j < len(grid); j++ {
 		rs++
 		if cell <= grid[x][j] {
 			break

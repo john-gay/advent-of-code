@@ -13,11 +13,11 @@ import (
 var input = "day7/input.txt"
 
 type Dir struct {
-	name string
-	parent *Dir
+	name        string
+	parent      *Dir
 	directories []*Dir
-	files []File
-	totalSize int
+	files       []File
+	totalSize   int
 }
 
 type File struct {

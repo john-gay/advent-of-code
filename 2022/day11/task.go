@@ -13,11 +13,11 @@ import (
 
 var input = "day11/input.txt"
 
-type Monkey struct {	
-	items []int
+type Monkey struct {
+	items     []int
 	operation func(old int) int
-	test func(item int) int
-	base int
+	test      func(item int) int
+	base      int
 	inspected int
 }
 
@@ -36,7 +36,7 @@ func main() {
 func run() (int, int) {
 	p1 := play(getMonkeys(), 20, 3)
 	p2 := play(getMonkeys(), 10000, 1)
-	
+
 	return p1, p2
 }
 
@@ -46,7 +46,7 @@ func play(monkeys map[int]*Monkey, turns, divisor int) int {
 		commonMultiple *= monkeys[i].base
 	}
 
-	for turn := 0; turn<turns; turn++ {
+	for turn := 0; turn < turns; turn++ {
 		for i := 0; i < len(monkeys); i++ {
 			size := len(monkeys[i].items)
 			for j := 0; j < size; j++ {
@@ -136,7 +136,7 @@ func getMonkeys() map[int]*Monkey {
 					tm := trueMonkey
 					t := test
 					monkey.test = func(item int) int {
-						if item % t == 0 {
+						if item%t == 0 {
 							return tm
 						} else {
 							return nf
