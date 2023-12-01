@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var input = "day10/input.txt"
+var input = "2022/day10/input.txt"
 
 type task struct {
 	cycles map[int]int

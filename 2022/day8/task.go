@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var input = "day8/input.txt"
+var input = "2022/day8/input.txt"
 
 type Dir struct {
 	name        string

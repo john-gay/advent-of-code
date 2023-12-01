@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var input = "day16/input.txt"
+var input = "2022/day16/input.txt"
 
 type Task struct {
 	valves  map[string]bool

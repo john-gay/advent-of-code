@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var input = "day19/input.txt"
+var input = "2022/day19/input.txt"
 
 type Blueprint struct {
 	number int

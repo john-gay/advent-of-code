@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var input = "day11/input.txt"
+var input = "2022/day11/input.txt"
 
 type Monkey struct {
 	items     []int

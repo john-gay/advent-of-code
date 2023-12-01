@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var input = "day20/input.txt"
+var input = "2022/day20/input.txt"
 
 type Task struct {
 	items []Item

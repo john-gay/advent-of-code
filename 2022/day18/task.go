@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var input = "day18/input.txt"
+var input = "2022/day18/input.txt"
 
 type Point struct {
 	x int

@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var input = "day14/input.txt"
+var input = "2022/day14/input.txt"
 
 type task struct {
 	grid   map[coord]string

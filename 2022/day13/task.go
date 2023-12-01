@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var input = "day13/input.txt"
+var input = "2022/day13/input.txt"
 
 func main() {
 	start := time.Now()

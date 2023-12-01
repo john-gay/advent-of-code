@@ -21,7 +21,7 @@ func main() {
 }
 
 func run() (int, int) {
-	file, err := os.Open("day6/input.txt")
+	file, err := os.Open("2022/day6/input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

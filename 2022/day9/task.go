@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var input = "day9/input.txt"
+var input = "2022/day9/input.txt"
 
 type rope struct {
 	knots   []coord

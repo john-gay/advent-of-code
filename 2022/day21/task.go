@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var input = "day21/input.txt"
+var input = "2022/day21/input.txt"
 
 type Task struct {
 	monkeys map[string]any

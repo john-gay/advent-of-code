@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var input = "day15/input.txt"
+var input = "2022/day15/input.txt"
 
 type Task struct {
 	sensors map[Point]Sensor

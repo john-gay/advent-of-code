@@ -11,7 +11,7 @@ import (
 func main() {
 	start := time.Now()
 
-	file, err := os.Open("day2/input.txt")
+	file, err := os.Open("2022/day2/input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
