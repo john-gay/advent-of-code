@@ -39,8 +39,10 @@ func main() {
 	// fmt.Println(task.numbers)
 
 	part1 := task.sumEngineParts()
+	part2 := task.sumGearRatio()
 
 	log.Println(fmt.Sprintf("Part 1: %d", part1))
+	log.Println(fmt.Sprintf("Part 2: %d", part2))
 
 	elapsed := time.Since(start)
 	log.Printf("Binomial took %s", elapsed)
@@ -108,6 +110,33 @@ func (t *Task) checkForward(x, y int, row []string, number *Number, numString st
 	t.grid[Coord{x: x+1, y: y}] = ch
 	numString += ch
 	return t.checkForward(x+1, y, row, number, numString)
+}
+
+func (t *Task) sumGearRatio() int {
+	sum := 0
+	for c, value := range t.grid {
+		if value == "*" {
+			adjacentNumbers := map[int]bool{}
+			for i := c.y - 1; i <= c.y + 1; i++ {
+				for j := c.x - 1; j <= c.x + 1; j++ {
+					coord := Coord{x: j, y: i}
+					for _, n := range t.numbers {
+						if slices.Contains(n.coords, coord) {
+							adjacentNumbers[n.value] = true
+						}
+					}
+				}
+			}
+			if len(adjacentNumbers) == 2 {
+				keys := []int{}
+				for k := range adjacentNumbers {
+					keys = append(keys, k)
+				}
+				sum += keys[0] * keys[1]
+			}
+		}
+	}
+	return sum
 }
 
 
