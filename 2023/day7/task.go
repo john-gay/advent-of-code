@@ -21,8 +21,8 @@ func main() {
 	part1 := Play(hands)
 	part2 := PlayJokersWild(hands)
 
-	log.Println(fmt.Sprintf("Part 1: %d", part1)) // 251121738
-	log.Println(fmt.Sprintf("Part 2: %d", part2)) // 251421071
+	log.Println(fmt.Sprintf("Part 1: %d", part1))
+	log.Println(fmt.Sprintf("Part 2: %d", part2))
 
 	elapsed := time.Since(start)
 	log.Printf("Binomial took %s", elapsed)
