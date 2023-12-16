@@ -35,9 +35,7 @@ func main() {
 	part2 := t2.totalLoad(true)
 
 	log.Println(fmt.Sprintf("Part 1: %d", part1))
-	log.Println(fmt.Sprintf("Part 2: %d", part2))
-
-	// 93718 too low
+	log.Println(fmt.Sprintf("Part 2: %d", part2)) // manually worked out from repeating pattern
 
 	elapsed := time.Since(start)
 	log.Printf("Binomial took %s", elapsed)
