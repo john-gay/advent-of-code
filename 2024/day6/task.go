@@ -76,13 +76,6 @@ func run() (int, int) {
 	return len(visited), part2
 }
 
-func printGrid(newGrid [][]string) {
-	for _, row := range newGrid {
-		fmt.Println(strings.Join(row, ""))
-	}
-	fmt.Println()
-}
-
 func patrol(grid [][]string, start []int) (map[string]int, bool) {
 	visited := map[string]int{}
 	current := []int{start[0], start[1]}
