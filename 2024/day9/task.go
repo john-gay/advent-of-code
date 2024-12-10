@@ -12,12 +12,6 @@ import (
 
 var input = "2024/day9/input.txt"
 
-type coord struct {
-	x, y int
-}
-
-var maxX, maxY int
-
 func main() {
 	start := time.Now()
 
@@ -40,7 +34,6 @@ func run() (int, int) {
 	part1, part2 := 0, 0
 
 	diskMap := []string{}
-	maxX, maxY = 0, 0
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
