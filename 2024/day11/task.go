@@ -53,30 +53,6 @@ func run() (int, int) {
 	return part1, part2
 }
 
-func blinkByArray(stones []int, turns int) int {
-	for i := 0; i < turns; i++ {
-		newStones := make([]int, len(stones))
-		padding := 0
-		for j := 0; j < len(stones); j++ {
-			key := j + padding
-			stoneStr := strconv.Itoa(stones[j])
-			if stones[j] == 0 {
-				newStones[key] = 1
-			} else if len(stoneStr)%2 == 0 {
-				mid := len(stoneStr) / 2
-				left, _ := strconv.Atoi(stoneStr[:mid])
-				right, _ := strconv.Atoi(stoneStr[mid:])
-				newStones = append(newStones[:key], append([]int{left, right}, newStones[key+1:]...)...)
-				padding++
-			} else {
-				newStones[key] = stones[j] * 2024
-			}
-		}
-		stones = newStones
-	}
-	return len(stones)
-}
-
 func blink(stones []int, turns int) int {
 	stoneMap := make(map[int]int)
 	for _, value := range stones {
