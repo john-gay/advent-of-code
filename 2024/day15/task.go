@@ -38,9 +38,10 @@ func run() (int, int) {
 	part1, part2 := 0, 0
 
 	grid := map[coord]string{}
+	wideGrid := map[coord]string{}
 	moves := []string{}
 	i := 0
-	start := coord{0, 0}
+	start, wideStart := coord{0, 0}, coord{0, 0}
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -52,10 +53,20 @@ func run() (int, int) {
 					if p[j] == "." {
 						continue
 					}
+
+					grid[coord{j, i}] = p[j]
+
 					if p[j] == "@" {
-						start = coord{i, j}
+						start = coord{j, i}
+						wideStart = coord{j*2, i}
+						wideGrid[coord{j*2, i}] = p[j]
+					} else if p[j] == "O" {
+						wideGrid[coord{j*2, i}] = "["
+						wideGrid[coord{j*2+1, i}] = "]"
+					} else {
+						wideGrid[coord{j*2, i}] = p[j]
+						wideGrid[coord{j*2+1, i}] = p[j]
 					}
-					grid[coord{i, j}] = p[j]
 				}
 				i++
 			} else {
@@ -64,93 +75,114 @@ func run() (int, int) {
 		}
 	}
 
-	printGrid(grid)
-
 	makeMoves(grid, moves, start)
 
-	printGrid(grid)
+	for k, v := range grid {
+		if v == "O" {
+			part1 += k.x + 100 * k.y
+		}
+	}
+
+	makeMoves(wideGrid, moves, wideStart)
+
+	for k, v := range wideGrid {
+		if v == "[" {
+			part2 += k.x + 100 * k.y
+		}
+	}
 
 	return part1, part2
 }
 
 func makeMoves(grid map[coord]string, moves []string, pos coord) {
-	for i, m := range moves {
+	for _, m := range moves {
 		var move coord
 		switch m {
 		case "^":
-			move = coord{-1, 0}
-		case "v":
-			move = coord{1, 0}
-		case ">":
-			move = coord{0, 1}
-		case "<":
 			move = coord{0, -1}
+		case "v":
+			move = coord{0, 1}
+		case ">":
+			move = coord{1, 0}
+		case "<":
+			move = coord{-1, 0}
 		}
 
-		if movable(grid, pos, move) {
-			moveChain(grid, pos, move)
+		if movable(grid, pos, move, m) {
+			nextPos := coord{pos.x + move.x, pos.y + move.y}
+			if grid[nextPos] == "O" || grid[nextPos] == "[" || grid[nextPos] == "]" {
+				moveBox(grid, nextPos, move, m)
+			}
+			grid[nextPos] = "@"
 			delete(grid, pos)
-			pos.x += move.x
-			pos.y += move.y
-			grid[pos] = "@"
-		}
 
-		fmt.Println(i, m)
-		printGrid(grid)
+			pos = nextPos
+		}
 	}
 }
 
-func moveChain(grid map[coord]string, pos coord, move coord) bool {
-	chain := []coord{}
-	current := pos
-
-	for {
-		nextPos := coord{current.x + move.x, current.y + move.y}
-
-		if grid[nextPos] == "#" {
-			return false
+func moveBox(grid map[coord]string, pos coord, move coord, m string) {
+	prevPos := coord{pos.x - move.x, pos.y - move.y}
+	nextPos := coord{pos.x + move.x, pos.y + move.y}
+	if grid[pos] == "#" {
+		return
+	}
+	if grid[pos] == "O" {
+		moveBox(grid, nextPos, move, m)
+	}
+	if grid[pos] == "[" {
+		if m == "^" || m == "v" {
+			moveBox(grid, nextPos, move, m)
+			moveBox(grid, coord{nextPos.x + 1, nextPos.y}, move, m)
+			delete(grid, coord{pos.x + 1, pos.y})
+		} else {
+			moveBox(grid, nextPos, move, m)
 		}
-
-		chain = append(chain, current)
-
-		if grid[nextPos] == "." {
-			chain = append(chain, nextPos)
-			break
+	}
+	if grid[pos] == "]" {
+		if m == "^" || m == "v" {
+			moveBox(grid, nextPos, move, m)
+			moveBox(grid, coord{nextPos.x - 1, nextPos.y}, move, m)
+			delete(grid, coord{pos.x -1, pos.y})
+		} else {
+			moveBox(grid, nextPos, move, m)
 		}
-
-		if grid[nextPos] == "0" {
-			current = nextPos
-			continue
-		}
-
-		break
 	}
 
-	for i := len(chain) - 1; i > 0; i-- {
-		current := chain[i]
-		prev := chain[i-1]
-		grid[current] = grid[prev]
-	}
-
-	delete(grid, chain[0])
-
-	return true
+	grid[pos] = grid[prevPos]
 }
 
-func movable(grid map[coord]string, pos coord, move coord) bool {
+func movable(grid map[coord]string, pos coord, move coord, m string) bool {
 	nextPos := coord{pos.x + move.x, pos.y + move.y}
 	if grid[nextPos] == "#" {
 		return false
 	}
-	if grid[nextPos] == "0" {
-		return movable(grid, nextPos, move)
+	if grid[nextPos] == "O" {
+		return movable(grid, nextPos, move, m)
+	}
+	if grid[nextPos] == "[" {
+		if m == "^" || m == "v" {
+			left := movable(grid, nextPos, move, m)
+			right := movable(grid, coord{nextPos.x + 1, nextPos.y}, move, m)
+			return left && right
+		} else {
+			return movable(grid, nextPos, move, m)
+		}
+	}
+	if grid[nextPos] == "]" {
+		if m == "^" || m == "v" {
+			right := movable(grid, nextPos, move, m)
+			left := movable(grid, coord{nextPos.x - 1, nextPos.y}, move, m)
+			return left && right
+		} else {
+			return movable(grid, nextPos, move, m)
+		}
 	}
 
 	return true
 }
 
 func printGrid(grid map[coord]string) {
-	// Find grid boundaries
 	minX, minY := math.MaxInt32, math.MaxInt32
 	maxX, maxY := math.MinInt32, math.MinInt32
 
@@ -161,16 +193,9 @@ func printGrid(grid map[coord]string) {
 		maxY = max(maxY, pos.y)
 	}
 
-	// Print column numbers
-	fmt.Print("   ")
-	for x := minX; x <= maxX; x++ {
-		fmt.Printf("%d", abs(x)%10)
-	}
 	fmt.Println()
 
-	// Print grid rows
 	for y := minY; y <= maxY; y++ {
-		fmt.Printf("%2d ", abs(y)%10)
 		for x := minX; x <= maxX; x++ {
 			if val, exists := grid[coord{x, y}]; exists {
 				fmt.Print(val)
@@ -181,11 +206,4 @@ func printGrid(grid map[coord]string) {
 		fmt.Println()
 	}
 	fmt.Println()
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
 }
