@@ -17,8 +17,8 @@ func main() {
 
 	part1, part2 := run()
 
-	log.Println(fmt.Sprintf("Part 1: %d, 43952536386", part1))
-	log.Println(fmt.Sprintf("Part 2: %d, 54486209237 too high, 54474986968 too low", part2))
+	log.Println(fmt.Sprintf("Part 1: %d", part1))
+	log.Println(fmt.Sprintf("Part 2: %d", part2))
 
 	elapsed := time.Since(start)
 	log.Printf("Binomial took %s", elapsed)
@@ -53,8 +53,6 @@ func run() (int, int) {
 	}
 
 	part1, part2 := 0, 0
-
-	fmt.Println(ranges)
 	
 	for _, r := range ranges {
 		for n := r.start; n <= r.end; n++ {
@@ -89,24 +87,6 @@ func run() (int, int) {
 					}
 				}
 			}
-			// if len(nAsStr) % 2 != 0 {
-			// 	if len(nAsStr) % 3 == 0 {
-			// 		chunkSize := len(nAsStr) / 3
-			// 		for i := 0; i < 3; i++ {
-			// 			if nAsStr[i*chunkSize:(i+1)*chunkSize] != nAsStr[i*chunkSize:(i+1)*chunkSize] {
-			// 				break
-			// 			}
-			// 			part2 += n
-			// 		}
-			// 	}
-			// } else {
-			// 	midpoint := len(nAsStr) / 2
-			// 	left := nAsStr[:midpoint]
-			// 	right := nAsStr[midpoint:]
-			// 	if left == right {
-			// 		part1 += n
-			// 	}
-			// }
 		}
 	}
 
