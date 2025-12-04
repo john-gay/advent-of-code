@@ -24,11 +24,6 @@ func main() {
 	log.Printf("Binomial took %s", elapsed)
 }
 
-type Range struct {
-	start int
-	end   int
-}
-
 func run() (int, int) {
 	file, err := os.Open(input)
 	if err != nil {
