@@ -89,13 +89,14 @@ func run() (int, int) {
 	part1, part2 := 0, 0
 
 	for _, machine := range machines {
-		part1 += optimalPresses(machine)
+		part1 += optimalPressesLights(machine)
+		part2 += optimalPressesJoltage(machine)
 	}
 
 	return part1, part2
 }
 
-func optimalPresses(machine Machine) int {
+func optimalPressesLights(machine Machine) int {
     numLights := len(machine.lights)
     numButtons := len(machine.buttons)
     
@@ -241,4 +242,168 @@ func solveGaussianElimination(A [][]int, b []int, numButtons int) []int {
     }
     
     return bestSolution
+}
+
+func optimalPressesJoltage(machine Machine) int {
+    numJoltages := len(machine.joltage)
+    numButtons := len(machine.buttons)
+    
+    A := make([][]int, numJoltages)
+    for i := range A {
+        A[i] = make([]int, numButtons)
+    }
+    
+    for buttonIdx, button := range machine.buttons {
+        for _, joltageIdx := range button {
+            if joltageIdx < numJoltages {
+                A[joltageIdx][buttonIdx] = 1
+            }
+        }
+    }
+    
+    b := make([]int, numJoltages)
+    copy(b, machine.joltage)
+    
+    solution := solveIntegerLinearSystem(A, b, numButtons)
+    
+    if solution == nil {
+        return 0
+    }
+    
+    presses := 0
+    for _, press := range solution {
+        presses += press
+    }
+    
+    return presses
+}
+
+func solveIntegerLinearSystem(A [][]int, b []int, numButtons int) []int {
+    numEquations := len(A)
+    
+    augmented := make([][]int, numEquations)
+    for i := range augmented {
+        augmented[i] = make([]int, numButtons+1)
+        copy(augmented[i], A[i])
+        augmented[i][numButtons] = b[i]
+    }
+    
+    pivotCols := []int{}
+    pivotRows := make(map[int]int)
+    currentRow := 0
+    
+    for col := 0; col < numButtons && currentRow < numEquations; col++ {
+        pivotRow := -1
+        for row := currentRow; row < numEquations; row++ {
+            if augmented[row][col] != 0 {
+                pivotRow = row
+                break
+            }
+        }
+        
+        if pivotRow == -1 {
+            continue
+        }
+        
+        augmented[currentRow], augmented[pivotRow] = augmented[pivotRow], augmented[currentRow]
+        pivotCols = append(pivotCols, col)
+        pivotRows[col] = currentRow
+        
+        for row := 0; row < numEquations; row++ {
+            if row != currentRow && augmented[row][col] != 0 {
+                factor := augmented[row][col]
+                pivot := augmented[currentRow][col]
+                
+                for c := 0; c <= numButtons; c++ {
+                    augmented[row][c] = augmented[row][c]*pivot - augmented[currentRow][c]*factor
+                }
+            }
+        }
+        
+        currentRow++
+    }
+    
+    for row := currentRow; row < numEquations; row++ {
+        if augmented[row][numButtons] != 0 {
+            return nil
+        }
+    }
+    
+    freeVars := []int{}
+    for col := 0; col < numButtons; col++ {
+        if _, exists := pivotRows[col]; !exists {
+            freeVars = append(freeVars, col)
+        }
+    }
+    
+    var bestSolution []int
+    minPresses := -1
+    
+    maxVal := 500
+    if len(freeVars) == 0 {
+        maxVal = 1
+    } else if len(freeVars) == 1 {
+        maxVal = 500
+    } else if len(freeVars) == 2 {
+        maxVal = 250
+    } else if len(freeVars) == 3 {
+        maxVal = 50
+    } else {
+        maxVal = 20
+    }
+    
+    generateCombinations(freeVars, maxVal, 0, make([]int, numButtons), &bestSolution, &minPresses, augmented, pivotCols, pivotRows, numButtons)
+    
+    return bestSolution
+}
+
+func generateCombinations(freeVars []int, maxVal, idx int, current []int, bestSolution *[]int, minPresses *int, augmented [][]int, pivotCols []int, pivotRows map[int]int, numButtons int) {
+    if idx == len(freeVars) {
+        solution := make([]int, numButtons)
+        copy(solution, current)
+        
+        valid := true
+        for i := len(pivotCols) - 1; i >= 0; i-- {
+            col := pivotCols[i]
+            row := pivotRows[col]
+            
+            val := augmented[row][numButtons]
+            for j := col + 1; j < numButtons; j++ {
+                val -= augmented[row][j] * solution[j]
+            }
+            
+            if augmented[row][col] == 0 || val%augmented[row][col] != 0 {
+                valid = false
+                break
+            }
+            
+            solution[col] = val / augmented[row][col]
+            
+            if solution[col] < 0 {
+                valid = false
+                break
+            }
+        }
+        
+        if !valid {
+            return
+        }
+        
+        presses := 0
+        for _, press := range solution {
+            presses += press
+        }
+        
+        if *minPresses == -1 || presses < *minPresses {
+            *minPresses = presses
+            *bestSolution = make([]int, numButtons)
+            copy(*bestSolution, solution)
+        }
+        return
+    }
+    
+    for val := 0; val < maxVal; val++ {
+        current[freeVars[idx]] = val
+        generateCombinations(freeVars, maxVal, idx+1, current, bestSolution, minPresses, augmented, pivotCols, pivotRows, numButtons)
+    }
 }
